@@ -18,15 +18,13 @@ function renderApp() {
       console.log('==> 😭  React Router match failed.'); // eslint-disable-line no-console
     }
 
-    if (process.env.NODE_ENV === 'development' && module.hot) {
-      // Preact's default behaviour is to append to the container, rather than
-      // replace existing content like in React.  The Preact Compat is supposed
-      // to emulate React's behaviour however it seems to be having problems
-      // with this dynamic routing configuration, therefore we manually clear
-      // out our container before doing any rendering.
-      while (container.firstChild) {
-        container.removeChild(container.firstChild);
-      }
+    // Preact's default behaviour is to append to the container, rather than
+    // replace existing content like in React.  The Preact Compat is supposed
+    // to emulate React's behaviour however it seems to be having problems
+    // with this dynamic routing configuration, therefore we manually clear
+    // out our container before doing any rendering.
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
     }
 
     render(
