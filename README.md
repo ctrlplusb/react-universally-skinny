@@ -31,7 +31,7 @@ Take a look at the differences in bundle size output...
 | 1-9aa9096e3fc8a0c2c097.js     | 1.3 KB           |
 | 0-caed1bc1f639ca595cb2.js     | 1.0 KB           |
 
-### `react-universally-skinny`
+### [`react-universally-skinny`](https://github.com/ctrlplusb/react-universally-skinny)
 
 | Chunk Name                    |  Size (GZipped)  |
 |-------------------------------|------------------|
