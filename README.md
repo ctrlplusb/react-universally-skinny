@@ -1,3 +1,9 @@
+## [WIP]
+
+There are a couple of issues with SSR still, but hope to have them resolved soon.  Standard client rendering is working as expected. 
+
+---
+
 <p align='center'>
   <h1 align='center'>React, Universally - Skinny</h1>
   <p align='center'><img width='60' src='https://raw.githubusercontent.com/ctrlplusb/assets/master/logos/react-universally-skinny.png' /></p>
