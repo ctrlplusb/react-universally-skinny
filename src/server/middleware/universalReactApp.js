@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createElement } from 'react';
 import RouterContext from 'react-router/lib/RouterContext';
 import createMemoryHistory from 'react-router/lib/createMemoryHistory';
 import match from 'react-router/lib/match';
@@ -35,7 +35,12 @@ function universalReactAppMiddleware(request, response) {
       // your "not found" component or route respectively, and send a 404 as
       // below, if you're using a catch-all route.
 
-      const html = render({ rootElement: <RouterContext {...renderProps} /> });
+      const html = render({
+        // TODO: Remove the "createElement" prop when preact/preact-compat
+        // sorts out issues with default props validation.
+        rootElement: <RouterContext {...renderProps} createElement={createElement} />,
+      });
+      // const html = render({ rootElement: <div>foo</div> });
       response.status(200).send(html);
     } else {
       response.status(404).send('Not found');
