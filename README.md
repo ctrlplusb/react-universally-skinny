@@ -1,6 +1,8 @@
 ## [WIP]
 
-There are a couple of issues with SSR still, but hope to have them resolved soon.  Standard client rendering is working as expected. 
+There are a couple of issues with the `preact` implementation at the moment.  
+
+I have managed to get SSR working, but I am currently pointing to a custom build of `preact-compat` and I have put in a few workarounds in the codebase to address some other issues with `preact` and prop validation.  When these issues have been sorted I will release this project from WIP and do a 1.0.0 release.
 
 ---
 
