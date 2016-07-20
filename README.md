@@ -9,7 +9,7 @@ I have managed to get SSR working, but I am currently pointing to a custom build
 <p align='center'>
   <h1 align='center'>React, Universally - Skinny</h1>
   <p align='center'><img width='60' src='https://raw.githubusercontent.com/ctrlplusb/assets/master/logos/react-universally-skinny.png' /></p>
-  <p align='center'>A "when size matters" ultra low dependency node v6 universal react boilerplate with an amazing dev experience.</p>
+  <p align='center'>A "when size matters" adaptation of the <a href="https://github.com/ctrlplusb/react-universally"><code>react-universally</code></a> boilerplate.</p>
 </p>
 
 ## TOC
@@ -58,7 +58,7 @@ Of course these don't come without a cost.  As we are using `preact` we have had
   - 🔥 Extreme live development - hot reloading of client/server source as well as your _webpack configuration_, with high level of error tolerance.
   - 🔨 `express` server with a basic security configuration.
   - 🔨 `react` as the view  (provided via `preact` and `preact-compat`).
-  - 🔨 `react-router` as the router, along with a dynamic routing configuration (i.e. you get code splitting based on your routes).
+  - 🔨 `react-router` as the router, along with a dynamic routing configuration (i.e. you get code splitting based on your routes). _Note: we are using the v3 alpha version as it provides greater size savings.  Make sure you are aware of the [breaking changes](https://github.com/reactjs/react-router/blob/next/CHANGES.md)_
   - 🔨 Very basic CSS support - it's up to you to extend it into CSS Modules, SASS, PostCSS, Aphrodite etc.
   - 🚀 Full ES2015 support, using `babel` to transpile where needed.
   - 📦 Bundling of both client and server using `webpack` v2.
@@ -188,6 +188,7 @@ Fret not! This is a known issue when using React Hot Loader 3 alongside React Ro
 
 ## References ##
 
+  - __react-router v3 changelog__ - https://github.com/reactjs/react-router/blob/next/CHANGES.md
   - __preact__ - https://github.com/developit/preact
   - __Webpack 2__ - https://gist.github.com/sokra/27b24881210b56bbaff7
   - __React Hot Loader v3__ - https://github.com/gaearon/react-hot-boilerplate/pull/61
