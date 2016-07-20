@@ -43,8 +43,8 @@ Take a look at the differences in bundle size output...
 
 | Chunk Name                    |  Size (GZipped)  |
 |-------------------------------|------------------|
-| main-cb2669ecf95d09720eb1.js  | 20.4 KB          |
-| 1-9aa9096e3fc8a0c2c097.js     | 1.1 KB           |
+| main-cb2669ecf95d09720eb1.js  | 20.2 KB          |
+| 1-9aa9096e3fc8a0c2c097.js     | 0.849 KB         |
 | 0-caed1bc1f639ca595cb2.js     | 1.1 KB           |
 
 BOOM, ___60%___ size savings!
