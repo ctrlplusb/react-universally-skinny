@@ -25,7 +25,7 @@ I have managed to get SSR working, but I am currently pointing to a custom build
 
 ## About
 
-This is an alternative version of the [`react-universally`](https://github.com/ctrlplusb/react-universally), a boilerplate that contains an absolutely minimal set of dependencies in order to get you up and running with a universal react project as quickly as possible. It provides you with a great development experience that includes hot reloading of everything. 
+This is an alternative version of [`react-universally`](https://github.com/ctrlplusb/react-universally), a boilerplate that contains an absolutely minimal set of dependencies in order to get you up and running with a universal react project as quickly as possible. It provides you with a great development experience that includes hot reloading of everything. 
 
 This adaptation of the boilerplate attempts to provide you with as small as a client bundle size as possible.  It does so by making use of the amazing `preact` and `preact-compat` libraries.  
 
