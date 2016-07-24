@@ -16,12 +16,8 @@ function App({ children }) {
       </div>
       <div>
         <ul>
-          {/*
-            TODO: Remove the "onlyActiveOnIndex" props when preact/preact-compat
-            sorts out issues with default props validation.
-          */}
-          <li><Link to="/" onlyActiveOnIndex>Home</Link></li>
-          <li><Link to="/about" onlyActiveOnIndex>About</Link></li>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/about">About</Link></li>
         </ul>
 
       </div>
