@@ -1,11 +1,3 @@
-## [WIP]
-
-There are a couple of issues with the `preact` implementation at the moment.  
-
-I have managed to get SSR working, but I am currently pointing to a custom build of `preact-compat` and I have put in a few workarounds in the codebase to address some other issues with `preact` and prop validation.  When these issues have been sorted I will release this project from WIP and do a 1.0.0 release.
-
----
-
 <p align='center'>
   <h1 align='center'>React, Universally - Skinny</h1>
   <p align='center'><img width='60' src='https://raw.githubusercontent.com/ctrlplusb/assets/master/logos/react-universally-skinny.png' /></p>
