@@ -89,7 +89,6 @@ function webpackConfigFactory({ target, mode }, { json }) {
       __dirname: true,
       __filename: true,
     },
-    // cache: !(isDev && isServer),
     // Anything listed in externals will not be included in our bundle.
     externals: removeEmpty([
       // We don't want our node_modules to be bundled with our server package,
@@ -97,21 +96,20 @@ function webpackConfigFactory({ target, mode }, { json }) {
       // we use the `webpack-node-externals` library to help us generate an
       // externals config that will ignore all node_modules.
       ifServer(nodeExternals({
-        // Okay, this is slightly hacky. There are some libraries we want/need
-        // webpack to process, therefore we lie to the 'webpack-node-externals'
-        // and list these as binaries which will make sure they don't get
-        // added to the externals list.
-        binaryDirs: [
-          // We want 'normalize.css' to be processed by our css loader.
-          'normalize.css',
-          // We need react and react-dom here as they are aliased by our
-          // webpack configuration.
-          'react',
-          'react-dom',
-          // List out any libraries that you depend on here, which have a
-          // dependency on react. This is so that their react dependency
-          // can be aliased to preact-compat.
-          'react-router',
+        // NOTE: !!!
+        // However the node_modules may contain files that will rely on our
+        // webpack loaders in order to be used/resolved, for example CSS or
+        // SASS. For these cases please make sure that the file extensions
+        // are added to the below list. We have added the most common formats.
+        whitelist: [
+          /\.(eot|woff|woff2|ttf|otf)$/,
+          /\.(svg|png|jpg|jpeg|gif)$/,
+          /\.(mp4|mp3|ogg|swf|webp)$/,
+          /\.(css|scss|sass|sss|less)$/,
+          // We need to add any react modules to our whitelist as we need
+          // webpack to alias any imports of react/react-dom to the respective
+          // preact libraries.
+          /react/,
         ],
       })),
     ]),
@@ -270,6 +268,7 @@ function webpackConfigFactory({ target, mode }, { json }) {
           loader: 'babel-loader',
           exclude: [/node_modules/, path.resolve(__dirname, './build')],
           query: merge(
+            {},
             ifServer({
               // We are running a node 6 server which has support for almost
               // all of the ES2015 syntax, therefore we only transpile JSX.
@@ -293,6 +292,17 @@ function webpackConfigFactory({ target, mode }, { json }) {
         {
           test: /\.json$/,
           loader: 'json-loader',
+        },
+
+        // Images and Fonts
+        {
+          test: /\.(jpg|jpeg|png|gif|eot|svg|ttf|woff|woff2|otf)$/,
+          loader: 'url-loader',
+          query: {
+            // Any file with a byte smaller than this will be "inlined" via
+            // a base64 representation.
+            limit: 10000,
+          },
         },
 
         // CSS
