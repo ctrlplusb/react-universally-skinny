@@ -1,6 +1,6 @@
 {
-  "name": "react-universally",
-  "version": "0.0.1",
+  "name": "react-universally-skinny",
+  "version": "1.0.0",
   "description": "A \"when size matters\" adaptation of the react-universally boilerplate.",
   "main": "build/server/main.js",
   "engines": {
