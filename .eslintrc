@@ -10,6 +10,8 @@
     "defaultParams": true
   },
   "rules": {
+    "react/jsx-filename-extension": [0],
+    "import/no-extraneous-dependencies": [0],
     "import/no-unresolved": [2, { ignore: ['^react(-dom(\/server)?)?$'] }]
   }
 }
