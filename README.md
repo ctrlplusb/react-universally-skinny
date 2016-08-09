@@ -27,17 +27,17 @@ Take a look at the differences in bundle size output...
 
 | Chunk Name                    |  Size (GZipped)  |
 |-------------------------------|------------------|
-| main-cb2669ecf95d09720eb1.js  | 55.9 KB          |
-| 1-9aa9096e3fc8a0c2c097.js     | 1.3 KB           |
+| main-cb2669ecf95d09720eb1.js  | 70.6 KB          |
+| 1-9aa9096e3fc8a0c2c097.js     | 1.4 KB           |
 | 0-caed1bc1f639ca595cb2.js     | 1.0 KB           |
 
 ### [`react-universally-skinny`](https://github.com/ctrlplusb/react-universally-skinny)
 
 | Chunk Name                    |  Size (GZipped)  |
 |-------------------------------|------------------|
-| main-cb2669ecf95d09720eb1.js  | 20.2 KB          |
-| 1-9aa9096e3fc8a0c2c097.js     | 0.849 KB         |
-| 0-caed1bc1f639ca595cb2.js     | 1.1 KB           |
+| main-cb2669ecf95d09720eb1.js  | 24.5 KB          |
+| 1-9aa9096e3fc8a0c2c097.js     | 0.861 KB         |
+| 0-caed1bc1f639ca595cb2.js     | 1.0 KB          |
 
 BOOM, ___60%___ size savings!
 

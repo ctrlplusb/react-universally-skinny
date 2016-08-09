@@ -16,8 +16,8 @@ function App({ children }) {
       */}
       <Helmet
         htmlAttributes={{ lang: 'en' }}
-        title="React Universally"
-        defaultTitle="React Universally"
+        titleTemplate="React Universally (Skinny) - %s"
+        defaultTitle="React Universally (Skinny)"
         meta={[
           { name: 'description', content: websiteDescription },
         ]}
