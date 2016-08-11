@@ -1,25 +1,19 @@
 <p align='center'>
   <h1 align='center'>React, Universally - Skinny</h1>
   <p align='center'><img width='60' src='https://raw.githubusercontent.com/ctrlplusb/assets/master/logos/react-universally-skinny.png' /></p>
-  <p align='center'>A "when size matters" adaptation of the <a href="https://github.com/ctrlplusb/react-universally"><code>react-universally</code></a> boilerplate.</p>
+  <p align='center'>A "when size matters" adaptation of the <a href="https://github.com/ctrlplusb/react-universally"><code>react-universally</code></a> starter kit.</p>
 </p>
 
 ## TOC
 
  - [About](https://github.com/ctrlplusb/react-universally#about)
- - [Features](https://github.com/ctrlplusb/react-universally#features)
- - [Overview](https://github.com/ctrlplusb/react-universally#overview)
- - [Project Structure](https://github.com/ctrlplusb/react-universally#project-structure)
- - [Server Runtime Dependencies](https://github.com/ctrlplusb/react-universally#server-runtime-dependencies)
- - [Deploy your very own Server Side Rendering React App in 5 easy steps](https://github.com/ctrlplusb/react-universally#deploy-your-very-own-server-side-rendering-react-app-in-5-easy-steps)
- - [npm script commands](https://github.com/ctrlplusb/react-universally#npm-script-commands)
  - [References](https://github.com/ctrlplusb/react-universally#references)
 
 ## About
 
-This is an alternative version of [`react-universally`](https://github.com/ctrlplusb/react-universally), a boilerplate that contains an absolutely minimal set of dependencies in order to get you up and running with a universal react project as quickly as possible. It provides you with a great development experience that includes hot reloading of everything.
+This is an alternative version of [`react-universally`](https://github.com/ctrlplusb/react-universally) (a starter kit that contains all the build tooling and configuration you need to kick off your next universal react project, whilst containing a minimal "project" set up allowing you to make your own architecture decisions).  Please reference the [`react-universally`](https://github.com/ctrlplusb/react-universally) documentation for the features contained within this starter kit.
 
-This adaptation of the boilerplate attempts to provide you with as small as a client bundle size as possible whilst maintaining the equivalent features/functionality.  It does so by making use of the amazing `preact` and `preact-compat` libraries.  
+This adaptation of the starter kit attempts to provide you with as small as a client bundle size as possible whilst maintaining the equivalent features/functionality.  It does so by making use of the amazing `preact` and `preact-compat` libraries.  
 
 Take a look at the differences in bundle size output...
 
@@ -41,7 +35,7 @@ Take a look at the differences in bundle size output...
 
 BOOM, ___60%___ size savings!
 
-Of course these don't come without a cost.  As we are using `preact` we have had to drop `react-hot-loader` and instead replace it with a native implementation of `webpack` HMR feature.
+Of course these don't come without a cost.  As we are using `preact` we have had to drop `react-hot-loader` and instead replace it with a native implementation of `webpack` HMR feature.  You still have hot reloading, it's not as powerful, but it's probably good enough.
 
 ## References ##
 

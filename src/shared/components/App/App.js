@@ -1,4 +1,6 @@
-import React, { PropTypes } from 'react';
+/* @flow */
+
+import React from 'react';
 import Link from 'react-router/lib/Link';
 import Helmet from 'react-helmet';
 import 'normalize.css/normalize.css';
@@ -7,7 +9,8 @@ import logo from './logo.png';
 
 const websiteDescription = 'A "when size matters" adaptation of the react-universally boilerplate.';
 
-function App({ children }) {
+function App(props : { children : $React$Children }) {
+  const { children } = props;
   return (
     <div style={{ padding: '10px' }}>
       {/*
@@ -46,8 +49,5 @@ function App({ children }) {
     </div>
   );
 }
-App.propTypes = {
-  children: PropTypes.node,
-};
 
 export default App;

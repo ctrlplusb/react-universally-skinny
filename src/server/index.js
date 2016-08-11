@@ -1,3 +1,5 @@
+/* @flow */
+
 // This grants us source map support, which is handy as our webpack bundling
 // for the server will include source maps.  Therefore we will have nice stack
 // traces again for our server.
@@ -7,11 +9,14 @@ import express from 'express';
 import compression from 'compression';
 import hpp from 'hpp';
 import helmet from 'helmet';
-import path from 'path';
-import appRoot from 'app-root-path';
 import universalReactAppMiddleware from './middleware/universalReactApp';
-
-const appRootPath = appRoot.toString();
+import {
+  CLIENT_BUNDLE_HTTP_PATH,
+  CLIENT_BUNDLE_OUTPUT_PATH,
+  CLIENT_BUNDLE_CACHE_MAXAGE,
+  SERVER_PORT,
+  PUBLIC_DIR_PATH,
+} from './config';
 
 // Create our express based server.
 const app = express();
@@ -44,22 +49,20 @@ app.use(compression());
 
 // Configure static serving of our webpack bundled client files.
 app.use(
-  process.env.CLIENT_BUNDLE_HTTP_PATH,
-  express.static(path.resolve(appRootPath, process.env.CLIENT_BUNDLE_OUTPUT_PATH))
+  CLIENT_BUNDLE_HTTP_PATH,
+  express.static(CLIENT_BUNDLE_OUTPUT_PATH, { maxAge: CLIENT_BUNDLE_CACHE_MAXAGE })
 );
 
-// Configure static serving of our "public" static files.
-app.use('/public/', express.static(path.resolve(appRootPath, './public')));
+// Configure static serving of our "public" root http path static files.
+app.use(express.static(PUBLIC_DIR_PATH));
 
 // Bind our universal react app middleware as the handler for all get requests.
 app.get('*', universalReactAppMiddleware);
 
 // Create an http listener for our express app.
-const listener = app.listen(parseInt(process.env.SERVER_PORT, 10));
+const listener = app.listen(SERVER_PORT);
 
-if (process.env.NODE_ENV === 'development') {
-  console.log(`==> 💚  HTTP Listener is running on port ${process.env.SERVER_PORT}`); // eslint-disable-line no-console,max-len
-}
+console.log(`==> üíö  HTTP Listener is running on port ${SERVER_PORT}`); // eslint-disable-line no-console,max-len
 
 // We export the listener as it will be handy for our development hot reloader.
 export default listener;

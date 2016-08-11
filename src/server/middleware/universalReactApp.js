@@ -1,16 +1,21 @@
+/* @flow */
+
+import type { Middleware } from 'express';
 import React from 'react';
 import RouterContext from 'react-router/lib/RouterContext';
 import createMemoryHistory from 'react-router/lib/createMemoryHistory';
 import match from 'react-router/lib/match';
 import render from '../htmlPage/render';
 import routes from '../../shared/routes';
+import { DISABLE_SSR } from '../config';
+import { IS_DEVELOPMENT } from '../../shared/config';
 
 /**
  * An express middleware that is capabable of doing React server side rendering.
  */
 function universalReactAppMiddleware(request, response) {
-  if (process.env.DISABLE_SSR) {
-    if (process.env.NODE_ENV === 'development') {
+  if (DISABLE_SSR) {
+    if (IS_DEVELOPMENT) {
       console.log('==> 🐌  Handling react route without SSR');  // eslint-disable-line no-console
     }
     // SSR is disabled so we will just return an empty html page and will
@@ -43,4 +48,4 @@ function universalReactAppMiddleware(request, response) {
   });
 }
 
-export default universalReactAppMiddleware;
+export default (universalReactAppMiddleware : Middleware);

@@ -1,6 +1,9 @@
 {
   "parser": "babel-eslint",
   "extends": "airbnb",
+  "plugins": [
+    "flow-vars"
+  ],
   "env": {
     "browser": true,
     "es6": true,
@@ -10,7 +13,14 @@
     "defaultParams": true
   },
   "rules": {
+    # We use the 'import' plugin which allows for cases "flow" awareness.
+    "no-duplicate-imports": 0,
+
+    "flow-vars/define-flow-type": 1,
+    "flow-vars/use-flow-type": 1,
+
     "react/jsx-filename-extension": [0],
+
     "import/no-extraneous-dependencies": [0],
     "import/no-unresolved": [2, { ignore: ['^react(-dom(\/server)?)?$'] }]
   }

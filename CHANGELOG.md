@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.0] - 2016-08-11
+
+### Changed
+
+Updated to match v3.3.1 API of react-universally.
+
+## [3.0.0] - 2016-08-09
+
+### Breaking Changes
+
+Updated to match v3.0.0 API of react-universally.
+
 ## [2.0.0] - 2016-08-08
 
 ### Breaking Changes
