@@ -21,15 +21,15 @@ Take a look at the differences in bundle size output...
 
 | Chunk Name                    |  Size (GZipped)  |
 |-------------------------------|------------------|
-| index.js                      | 99.7 KB          |
+| index.js                      | 72.9 KB          |
 
 ### [`react-universally-skinny`](https://github.com/ctrlplusb/react-universally-skinny)
 
 | Chunk Name                    |  Size (GZipped)  |
 |-------------------------------|------------------|
-| index.js                      | 63.6 KB          |
+| index.js                      | 37.4 KB          |
 
-BOOM, ___36%___ size savings!
+BOOM, ___48%___ size savings!
 
 Of course these don't come without a cost.  As we are using `preact` we have had to drop `react-hot-loader` and instead replace it with a native implementation of `webpack` HMR feature.  You still have hot reloading, it's not as powerful, but it's probably good enough.
 
