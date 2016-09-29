@@ -3,11 +3,15 @@
 import React from 'react';
 import Link from 'react-router/lib/Link';
 import Helmet from 'react-helmet';
+
 import 'normalize.css/normalize.css';
 import './globals.css';
-import logo from './logo.png';
 
-const websiteDescription = 'A "when size matters" adaptation of the react-universally boilerplate.';
+import Logo from './lib/Logo';
+
+const websiteDescription =
+  'A starter kit giving you the minimum requirements for a production ready ' +
+  'universal react application.';
 
 function App(props : { children : $React$Children }) {
   const { children } = props;
@@ -19,29 +23,24 @@ function App(props : { children : $React$Children }) {
       */}
       <Helmet
         htmlAttributes={{ lang: 'en' }}
-        titleTemplate="React Universally (Skinny) - %s"
-        defaultTitle="React Universally (Skinny)"
+        titleTemplate="React Universally - %s"
+        defaultTitle="React Universally"
         meta={[
           { name: 'description', content: websiteDescription },
         ]}
-        script={[
-          { src: 'https://cdn.polyfill.io/v2/polyfill.min.js', type: 'text/javascript' },
-        ]}
+        script={[]}
       />
 
-      <div style={{ textAlign: 'center' }}>
-        <img src={logo} alt="Logo" style={{ width: '40px' }} />
-        <h1>React, Universally - Skinny</h1>
-        <strong>
-          {websiteDescription}
-        </strong>
+      <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+        <Logo />
+        <h1>React, Universally</h1>
+        <strong>{websiteDescription}</strong>
       </div>
-      <div>
+      <div style={{ marginBottom: '1rem' }}>
         <ul>
           <li><Link to="/">Home</Link></li>
           <li><Link to="/about">About</Link></li>
         </ul>
-
       </div>
       <div>
         {children}

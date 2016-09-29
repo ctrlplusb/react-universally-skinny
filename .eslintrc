@@ -22,6 +22,7 @@
     "react/jsx-filename-extension": [0],
 
     "import/no-extraneous-dependencies": [0],
-    "import/no-unresolved": [2, { ignore: ['^react(-dom(\/server)?)?$'] }]
+    "import/no-unresolved": [2, { ignore: ['^react(-dom(\/server)?)?$'] }],
+    "import/extensions": [2, { "react": "never" }]
   }
 }

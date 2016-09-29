@@ -5,29 +5,21 @@ const webpack = require('webpack');
 const AssetsPlugin = require('assets-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const dotenv = require('dotenv');
 const appRoot = require('app-root-path');
 const WebpackMd5Hash = require('webpack-md5-hash');
 const { removeEmpty, ifElse, merge } = require('../utils');
+const envVars = require('../config/envVars');
 
 const appRootPath = appRoot.toString();
 
-// @see https://github.com/motdotla/dotenv
-dotenv.config(process.env.NOW
-  // This is to support deployment to the "now" host.  See the README for more info.
-  ? { path: path.resolve(appRootPath, './.envnow'), silent: true }
-  // Standard .env loading.
-  : { silent: true }
-);
-
 function webpackConfigFactory({ target, mode }, { json }) {
-  if (!target || !~['client', 'server'].findIndex(valid => target === valid)) {
+  if (!target || ['client', 'server', 'universalMiddleware'].findIndex(valid => target === valid) === -1) {
     throw new Error(
-      'You must provide a "target" (client|server) to the webpackConfigFactory.'
+      'You must provide a "target" (client|server|universalMiddleware) to the webpackConfigFactory.'
     );
   }
 
-  if (!mode || !~['development', 'production'].findIndex(valid => mode === valid)) {
+  if (!mode || ['development', 'production'].findIndex(valid => mode === valid) === -1) {
     throw new Error(
       'You must provide a "mode" (development|production) to the webpackConfigFactory.'
     );
@@ -43,30 +35,34 @@ function webpackConfigFactory({ target, mode }, { json }) {
     //   --env.mode production \
     //   --config webpack.client.config.js \
     //   --json \
+    //   --profile \
     //   > build/client/analysis.json
     //
     // And then upload the build/client/analysis.json to http://webpack.github.io/analyse/
     // This allows you to analyse your webpack bundle to make sure it is
     // optimal.
-    console.log(`==> ℹ️  Creating webpack "${target}" config in "${mode}" mode`);
+    console.log(`==> Creating webpack config for "${target}" in "${mode}" mode`);
   }
 
   const isDev = mode === 'development';
   const isProd = mode === 'production';
   const isClient = target === 'client';
   const isServer = target === 'server';
+  const isUniversalMiddleware = target === 'universalMiddleware';
+  const isNodeTarget = isServer || isUniversalMiddleware;
 
+  const ifNodeTarget = ifElse(isNodeTarget);
+  const ifReactTarget = ifElse(isClient || isUniversalMiddleware);
   const ifDev = ifElse(isDev);
-  const ifProd = ifElse(isProd);
   const ifClient = ifElse(isClient);
   const ifServer = ifElse(isServer);
-  const ifDevClient = ifElse(isDev && isClient);
   const ifDevServer = ifElse(isDev && isServer);
+  const ifDevClient = ifElse(isDev && isClient);
   const ifProdClient = ifElse(isProd && isClient);
 
   return {
     // We need to state that we are targetting "node" for our server bundle.
-    target: ifServer('node', 'web'),
+    target: ifNodeTarget('node', 'web'),
     // We have to set this to be able to use these items when executing a
     // server bundle.  Otherwise strangeness happens, like __dirname resolving
     // to '/'.  There is no effect on our client bundle.
@@ -76,11 +72,16 @@ function webpackConfigFactory({ target, mode }, { json }) {
     },
     // Anything listed in externals will not be included in our bundle.
     externals: removeEmpty([
+      // Don't allow the server to bundle the universal middleware bundle. We
+      // want the server to natively require it from the build dir.
+      ifServer(/universalMiddleware/),
+      ifDevServer(/universalDevMiddleware/),
+
       // We don't want our node_modules to be bundled with our server package,
       // prefering them to be resolved via native node module system.  Therefore
       // we use the `webpack-node-externals` library to help us generate an
       // externals config that will ignore all node_modules.
-      ifServer(nodeExternals({
+      ifNodeTarget(nodeExternals({
         // NOTE: !!!
         // However the node_modules may contain files that will rely on our
         // webpack loaders in order to be used/resolved, for example CSS or
@@ -91,6 +92,7 @@ function webpackConfigFactory({ target, mode }, { json }) {
           /\.(svg|png|jpg|jpeg|gif|ico)$/,
           /\.(mp4|mp3|ogg|swf|webp)$/,
           /\.(css|scss|sass|sss|less)$/,
+
           // We need to add any react modules to our whitelist as we need
           // webpack to alias any imports of react/react-dom to the respective
           // preact libraries.
@@ -98,7 +100,7 @@ function webpackConfigFactory({ target, mode }, { json }) {
         ],
       })),
     ]),
-    devtool: ifElse(isServer || isDev)(
+    devtool: ifElse(isNodeTarget || isDev)(
       // We want to be able to get nice stack traces when running our server
       // bundle.  To fully support this we'll also need to configure the
       // `node-source-map-support` module to execute at the start of the server
@@ -115,20 +117,16 @@ function webpackConfigFactory({ target, mode }, { json }) {
     // Define our entry chunks for our bundle.
     entry: merge(
       {
-        main: removeEmpty([
-          ifDevClient(`webpack-hot-middleware/client?reload=true&path=http://localhost:${process.env.CLIENT_DEVSERVER_PORT}/__webpack_hmr`),
+        index: removeEmpty([
+          ifDevClient(`webpack-hot-middleware/client?reload=true&path=http://localhost:${envVars.CLIENT_DEVSERVER_PORT}/__webpack_hmr`),
+          ifClient('babel-polyfill'),
           path.resolve(appRootPath, `./src/${target}/index.js`),
         ]),
       }
     ),
     output: {
       // The dir in which our bundle should be output.
-      path: path.resolve(
-        appRootPath,
-        isClient
-          ? process.env.CLIENT_BUNDLE_OUTPUT_PATH
-          : process.env.SERVER_BUNDLE_OUTPUT_PATH
-      ),
+      path: path.resolve(appRootPath, envVars.BUNDLE_OUTPUT_PATH, `./${target}`),
       // The filename format for our bundle's entries.
       filename: ifProdClient(
         // We include a hash for client caching purposes.  Including a unique
@@ -148,12 +146,12 @@ function webpackConfigFactory({ target, mode }, { json }) {
       publicPath: ifDev(
         // As we run a seperate server for our client and server bundles we
         // need to use an absolute http path for our assets public path.
-        `http://localhost:${process.env.CLIENT_DEVSERVER_PORT}${process.env.CLIENT_BUNDLE_HTTP_PATH}`,
+        `http://localhost:${envVars.CLIENT_DEVSERVER_PORT}${envVars.CLIENT_BUNDLE_HTTP_PATH}`,
         // Otherwise we expect our bundled output to be served from this path.
-        process.env.CLIENT_BUNDLE_HTTP_PATH
+        envVars.CLIENT_BUNDLE_HTTP_PATH
       ),
       // When in server mode we will output our bundle as a commonjs2 module.
-      libraryTarget: ifServer('commonjs2', 'var'),
+      libraryTarget: ifNodeTarget('commonjs2', 'var'),
     },
     resolve: {
       // These extensions are tried when resolving a file.
@@ -172,6 +170,26 @@ function webpackConfigFactory({ target, mode }, { json }) {
       },
     },
     plugins: removeEmpty([
+      // We use the System.import feature of webpack with a "dynamic" component
+      // path. (e.g. System.import(`../components/App/views/${viewName}/index.js`))
+      // This causes webpack to create a regex that will match for the dynamic
+      // part of the path (i.e. ${viewName}).  By default a greedy ".*" regex
+      // pattern will be used, and therefore any subfolders containing a
+      // "index.js" file will be considered a match and webpack will then
+      // create a seperate bundle for the path.  This is probably not going
+      // to be desirable for us, so I have overridden the regex that will be
+      // used below and have specified it in such a manner that only the root
+      // folders within "~/src/shared/components/App/views" that contain an
+      // "index.js" will be considered an async view component that should be
+      // used by webpack for code splitting.
+      // @see https://github.com/webpack/webpack/issues/87
+      ifReactTarget(
+          new webpack.ContextReplacementPlugin(
+          /components[\/\\]App[\/\\]views$/,
+          new RegExp(String.raw`^\.[\\\/](\w|\s|-|_)*[\\\/]index\.js$`)
+        )
+      ),
+
       // We use this so that our generated [chunkhash]'s are only different if
       // the content for our respective chunks have changed.  This optimises
       // our long term browser caching strategy for our client bundle, avoiding
@@ -179,6 +197,23 @@ function webpackConfigFactory({ target, mode }, { json }) {
       // even though 1 or 2 may have only changed.
       ifClient(new WebpackMd5Hash()),
 
+      // The DefinePlugin is used by webpack to substitute any patterns that it
+      // finds within the code with the respective value assigned below.
+      //
+      // For example you may have the following in your code:
+      //   if (process.env.NODE_ENV === 'development') {
+      //     console.log('Foo');
+      //   }
+      //
+      // If we assign the NODE_ENV variable in the DefinePlugin below a value
+      // of 'production' webpack will replace your code with the following:
+      //   if ('production' === 'development') {
+      //     console.log('Foo');
+      //   }
+      //
+      // This is very useful as we are compiling/bundling our code and we would
+      // like our environment variables to persist within the code.
+      //
       // Each key passed into DefinePlugin is an identifier.
       // The values for each key will be inlined into the code replacing any
       // instances of the keys that are found.
@@ -186,23 +221,34 @@ function webpackConfigFactory({ target, mode }, { json }) {
       // If the value isn’t a string, it will be stringified (including functions).
       // If the value is an object all keys are removeEmpty the same way.
       // If you prefix typeof to the key, it’s only removeEmpty for typeof calls.
-      new webpack.DefinePlugin({
-        'process.env': {
-          // NOTE: The NODE_ENV key is especially important for production
-          // builds as React relies on process.env.NODE_ENV for optimizations.
-          NODE_ENV: JSON.stringify(mode),
-          // All the below items match the config items in our .env file. Go
-          // to the .env_example for a description of each key.
-          SERVER_PORT: JSON.stringify(process.env.SERVER_PORT),
-          CLIENT_DEVSERVER_PORT: JSON.stringify(process.env.CLIENT_DEVSERVER_PORT),
-          DISABLE_SSR: JSON.stringify(process.env.DISABLE_SSR),
-          SERVER_BUNDLE_OUTPUT_PATH: JSON.stringify(process.env.SERVER_BUNDLE_OUTPUT_PATH),
-          CLIENT_BUNDLE_OUTPUT_PATH: JSON.stringify(process.env.CLIENT_BUNDLE_OUTPUT_PATH),
-          CLIENT_BUNDLE_ASSETS_FILENAME: JSON.stringify(process.env.CLIENT_BUNDLE_ASSETS_FILENAME),
-          CLIENT_BUNDLE_HTTP_PATH: JSON.stringify(process.env.CLIENT_BUNDLE_HTTP_PATH),
-          CLIENT_BUNDLE_CACHE_MAXAGE: JSON.stringify(process.env.CLIENT_BUNDLE_CACHE_MAXAGE),
-        },
-      }),
+      new webpack.DefinePlugin(
+        merge(
+          {
+            // NOTE: The NODE_ENV key is especially important for production
+            // builds as React relies on process.env.NODE_ENV for optimizations.
+            'process.env.NODE_ENV': JSON.stringify(mode),
+            // NOTE: If you are providing any environment variables from the
+            // command line rather than the .env files then you must make sure
+            // you add them here so that webpack can use them in during the
+            // compiling process.
+            // e.g.
+            // 'process.env.MY_CUSTOM_VAR': JSON.stringify(process.env.MY_CUSTOM_VAR)
+          },
+          // Now we will expose all of the .env config variables to webpack
+          // so that it can make all the subtitutions for us.
+          // Note: ALL of these values will be given as string types. Even if you
+          // set numeric/boolean looking values within your .env file. The parsing
+          // that we do of the .env file always returns the values as strings.
+          // Therefore in your code you may need to do operations like the
+          // following:
+          // const MY_NUMBER = parseInt(process.env.MY_NUMBER, 10);
+          // const MY_BOOL = process.env.MY_BOOL === 'true';
+          Object.keys(envVars).reduce((acc, cur) => {
+            acc[`process.env.${cur}`] = JSON.stringify(envVars[cur]); // eslint-disable-line no-param-reassign
+            return acc;
+          }, {})
+        )
+      ),
 
       ifClient(
         // Generates a JSON file containing a map of all the output files for
@@ -210,8 +256,8 @@ function webpackConfigFactory({ target, mode }, { json }) {
         // as we need to interogate these files in order to know what JS/CSS
         // we need to inject into our HTML.
         new AssetsPlugin({
-          filename: process.env.CLIENT_BUNDLE_ASSETS_FILENAME,
-          path: path.resolve(appRootPath, process.env.CLIENT_BUNDLE_OUTPUT_PATH),
+          filename: envVars.BUNDLE_ASSETS_FILENAME,
+          path: path.resolve(appRootPath, envVars.BUNDLE_OUTPUT_PATH, `./${target}`),
         })
       ),
 
@@ -221,10 +267,6 @@ function webpackConfigFactory({ target, mode }, { json }) {
 
       // We need this plugin to enable hot module reloading for our dev server.
       ifDevClient(new webpack.HotModuleReplacementPlugin()),
-
-      // Ensure only 1 file is output for the server bundles.  This makes it
-      // much easer for us to clear the module cache when reloading the server.
-      ifDevServer(new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })),
 
       // Adds options to all of our loaders.
       ifProdClient(
@@ -245,10 +287,17 @@ function webpackConfigFactory({ target, mode }, { json }) {
             screw_ie8: true,
             warnings: false,
           },
+          mangle: {
+            screw_ie8: true,
+          },
+          output: {
+            comments: false,
+            screw_ie8: true,
+          },
         })
       ),
 
-      ifProd(
+      ifProdClient(
         // This is actually only useful when our deps are installed via npm2.
         // In npm2 its possible to get duplicates of dependencies bundled
         // given the nested module structure. npm3 is flat, so this doesn't
@@ -263,40 +312,25 @@ function webpackConfigFactory({ target, mode }, { json }) {
       ),
     ]),
     module: {
-      loaders: [
+      rules: [
         // Javascript
         {
           test: /\.jsx?$/,
           loader: 'babel-loader',
-          exclude: [
-            /node_modules/,
-            path.resolve(appRootPath, process.env.CLIENT_BUNDLE_OUTPUT_PATH),
-            path.resolve(appRootPath, process.env.SERVER_BUNDLE_OUTPUT_PATH),
-          ],
-          query: merge(
-            {
-              plugins: [
-                'transform-object-rest-spread',
-                'transform-class-properties',
-              ],
-            },
-            ifServer({
-              // We are running a node 6 server which has support for almost
-              // all of the ES2015 syntax, therefore we only transpile JSX.
-              presets: ['react'],
-            }),
-            ifClient({
-              // For our clients code we will need to transpile our JS into
-              // ES5 code for wider browser/device compatability.
-              presets: [
-                // JSX
-                'react',
-                // Webpack 2 includes support for es2015 imports, therefore we
-                // disable the modules processing.
-                ['es2015', { modules: false }],
-              ],
-            })
-          ),
+          include: [path.resolve(appRootPath, './src')],
+          query: {
+            presets: [
+              // JSX
+              'react',
+              // All the latest JS goodies, except for ES6 modules which
+              // webpack has native support for and uses in the tree shaking
+              // process.
+              // TODO: When babel-preset-latest-minimal has stabilised use it
+              // for our node targets so that only the missing features for
+              // our respective node version will be transpiled.
+              ['latest', { modules: false }],
+            ],
+          },
         },
 
         // JSON
@@ -325,7 +359,7 @@ function webpackConfigFactory({ target, mode }, { json }) {
           { test: /\.css$/ },
           // When targetting the server we use the "/locals" version of the
           // css loader.
-          ifServer({
+          ifNodeTarget({
             loaders: [
               'css-loader/locals',
             ],
@@ -335,7 +369,7 @@ function webpackConfigFactory({ target, mode }, { json }) {
           // registered within the plugins section too.
           ifProdClient({
             loader: ExtractTextPlugin.extract({
-              notExtractLoader: 'style-loader',
+              fallbackLoader: 'style-loader',
               loader: 'css-loader',
             }),
           }),
