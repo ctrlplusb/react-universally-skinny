@@ -157,12 +157,6 @@ function webpackConfigFactory({ target, mode }, { json }) {
       libraryTarget: ifNodeTarget('commonjs2', 'var'),
     },
     resolve: {
-      // Note: we have had to explicitly remove the "jsnext:main" option here
-      // as preact-compat is using this and it causes the UglifyJsPlugin to
-      // fall over.
-      // @see https://github.com/developit/preact-compat/issues/192
-      mainFields: ['main', 'web'],
-
       // These extensions are tried when resolving a file.
       extensions: [
         '.js',
@@ -327,7 +321,11 @@ function webpackConfigFactory({ target, mode }, { json }) {
         {
           test: /\.jsx?$/,
           loader: 'babel-loader',
-          include: [path.resolve(appRootPath, './src')],
+          include: [
+            path.resolve(appRootPath, './src'),
+            // preact-compat has some es6 requirements. :)
+            path.resolve(appRootPath, './node_modules/preact-compat'),
+          ],
           query: {
             presets: [
               // JSX
