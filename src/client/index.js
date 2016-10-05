@@ -36,15 +36,6 @@ function renderApp(appRoutes) {
       routerError();
     }
 
-    // Preact's default behaviour is to append to the container, rather than
-    // replace existing content like in React.  The Preact Compat is supposed
-    // to emulate React's behaviour however it seems to be having problems
-    // with this dynamic routing configuration, therefore we manually clear
-    // out our container before doing any rendering.
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
-    }
-
     render(
       // We need to explicly render the Router component here instead of have
       // this embedded within a shared App type of component as we use different
