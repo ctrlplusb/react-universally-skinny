@@ -1,3 +1,11 @@
+### DEPRECATED
+
+I am no longer managing this repo. I am instead looking to integrate a branch on the [main repo](https://github.com/ctrlplusb/react-universally).
+
+Beware. This repo is out of date.
+
+----------
+
 <p align='center'>
   <h1 align='center'>React, Universally - Skinny</h1>
   <p align='center'><img width='60' src='https://raw.githubusercontent.com/ctrlplusb/assets/master/logos/react-universally-skinny.png' /></p>
